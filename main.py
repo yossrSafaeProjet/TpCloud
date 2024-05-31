@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import crud, models, schemas
@@ -61,3 +62,8 @@ def update_product(product_id: int, product: schemas.ProductCreate, db: Session 
     if db_product is None:
         raise HTTPException(status_code=404, detail="Produit non trouvé")
     return db_product
+
+@app.get("/products/category/{category_id}", response_model=List[schemas.Product])
+def get_products_by_category(category_id: int, db: Session = Depends(get_db)):
+    products = crud.filter_products_by_category(db, category_id)
+    return products
