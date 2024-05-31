@@ -16,6 +16,21 @@ def get_db():
         yield db
     finally:
         db.close()
+@app.post("/categories", response_model=schemas.Category)
+def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
+    return crud.create_category(db=db, category=category)
+
+@app.get("/categories", response_model=list[schemas.Category])
+def read_categories(skip: int = 0, limit: int = 10, search: str = None, db: Session = Depends(get_db)):
+    categories = crud.get_categories(db, skip=skip, limit=limit, search=search)
+    return categories
+
+@app.get("/categories/{category_id}", response_model=schemas.Category)
+def read_category(category_id: int, db: Session = Depends(get_db)):
+    category = crud.get_category(db, category_id=category_id)
+    if category is None:
+        raise HTTPException(status_code=404, detail="Catégorie non trouvée")
+    return category
 
 @app.post("/products", response_model=schemas.Product)
 def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):

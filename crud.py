@@ -1,6 +1,24 @@
 #crud.py
 from sqlalchemy.orm import Session
 import models, schemas
+# Fonction pour obtenir une catégorie par ID
+def get_category(db: Session, category_id: int):
+    return db.query(models.Category).filter(models.Category.id == category_id).first()
+
+# Fonction pour obtenir toutes les catégories avec pagination et recherche
+def get_categories(db: Session, skip: int = 0, limit: int = 10, search: str = None):
+    query = db.query(models.Category)
+    if search:
+        query = query.filter(models.Category.name.contains(search))
+    return query.offset(skip).limit(limit).all()
+
+# Fonction pour créer une nouvelle catégorie
+def create_category(db: Session, category: schemas.CategoryCreate):
+    db_category = models.Category(**category.dict())
+    db.add(db_category)
+    db.commit()
+    db.refresh(db_category)
+    return db_category
 #Fonction pour obtenir un produit par ID
 def get_product (db: Session, product_id: int):
     return db.query(models.Product).filter(models.Product.id==product_id).first()
@@ -29,7 +47,7 @@ def update_product(product_id: int, product_update: schemas.ProductCreate, db: S
         db_product.name = product_update.name
         db_product.description = product_update.description
         db_product.price = product_update.price
-        
+        db_product.category_id = product_update.category_id
         # Commit les changements à la base de données
         db.commit()
         db.refresh(db_product)
