@@ -26,4 +26,16 @@ def read_products(skip: int = 0, limit: int = 10, db: Session = Depends(get_db))
     products = crud.get_products(db, skip=skip, limit=limit)
     return products
 
+@app.get("/products/{product_id}", response_model=schemas.Product)
+def read_product(product_id: int, db: Session = Depends(get_db)):
+    product = crud.get_product(db, product_id=product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Produit non trouvé")
+    return product
 
+@app.delete("/products/{product_id}", response_model=schemas.Product)
+def delete_product(product_id: int, db: Session = Depends(get_db)):
+    product = crud.delete_product(db, product_id=product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Produit non trouvé")
+    return product
