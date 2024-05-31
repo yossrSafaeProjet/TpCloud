@@ -1,4 +1,5 @@
 #crud.py
+from typing import List
 from sqlalchemy.orm import Session
 import models, schemas
 # Fonction pour obtenir une catégorie par ID
@@ -55,3 +56,8 @@ def update_product(product_id: int, product_update: schemas.ProductCreate, db: S
     else:
         # Si le produit n'existe pas, retourner None ou lever une exception
         return None
+#Fonction pour filter un produit par category
+def filter_products_by_category(db: Session, id: int) -> List[models.Product]:
+    # Utiliser la session de base de données pour interroger les produits par catégorie
+    products = db.query(models.Product).filter(models.Product.category_id == id).all()
+    return products
