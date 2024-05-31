@@ -21,3 +21,19 @@ def delete_product(db: Session, product_id: int):
         db.delete(db_product)
         db.commit()
         return db_product
+
+#Fonction pour modifier un produit par ID
+def update_product(product_id: int, product_update: schemas.ProductCreate, db: Session):
+    db_product=db.query(models.Product).filter(models.Product.id ==product_id).first()
+    if db_product:
+        db_product.name = product_update.name
+        db_product.description = product_update.description
+        db_product.price = product_update.price
+        
+        # Commit les changements à la base de données
+        db.commit()
+        db.refresh(db_product)
+        return db_product
+    else:
+        # Si le produit n'existe pas, retourner None ou lever une exception
+        return None
