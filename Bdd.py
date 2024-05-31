@@ -20,14 +20,24 @@ try:
     print("Base de données créée avec succès")
     # Création d'un curseur
     cursor = db.cursor()
-
+    # Création de la table categorie
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS categories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            description TEXT
+        )
+    ''')
+    print("Table 'categories' créée avec succès")
     # Création de la table produit
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS produit (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             description TEXT,
-            price REAL NOT NULL
+            price REAL NOT NULL,
+            category_id INTEGER,
+            FOREIGN KEY (category_id) REFERENCES categories (id)    
         )
     ''')
     print("Table 'produit' créée avec succès")
@@ -37,6 +47,7 @@ try:
     cursor.execute('''
         CREATE INDEX IF NOT EXISTS idx_description ON produit (description)
     ''')
+
     # Validation des changements
     db.commit()
 except sqlite3.Error as e:
